@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: observabilidad
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib:latest
+        ports:
+        - containerPort: 4317
+          name: otlp-grpc
+        - containerPort: 55681
+          name: otlp-http
+        volumeMounts:
+        - name: config
+          mountPath: /etc/otel-collector-config
+        command: ["otelcontribcol"]
+        args: ["--config", "/etc/otel-collector-config/config.yaml"]
+      volumes:
+      - name: config
+        configMap:
+          name: otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: observabilidad
+spec:
+  type: ClusterIP
+  selector:
+    app: otel-collector
+  ports:
+  - port: 4317
+    targetPort: 4317
+    name: otlp-grpc
+  - port: 55681
+    targetPort: 55681
+    name: otlp-http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: observabilidad
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    exporters:
+      logging:
+        loglevel: debug
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [logging]

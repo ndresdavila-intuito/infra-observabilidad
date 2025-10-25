@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: victoria-metrics
+  namespace: observabilidad
+spec:
+  serviceName: victoria-metrics
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victoria-metrics
+  template:
+    metadata:
+      labels:
+        app: victoria-metrics
+    spec:
+      containers:
+      - name: victoria-metrics
+        image: victoriametrics/victoria-metrics-single:v1.95.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8428
+          name: http
+        volumeMounts:
+        - name: vm-storage
+          mountPath: /victoria-metrics-data
+      volumes:
+      - name: vm-storage
+        persistentVolumeClaim:
+          claimName: vm-pvc

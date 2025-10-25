@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-collector
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/tu-usuario/infra-observabilidad.git
+    targetRevision: main
+    path: otel-collector
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observabilidad
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
