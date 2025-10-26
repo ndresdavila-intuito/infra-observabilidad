@@ -4,13 +4,13 @@ metadata:
   name: clickhouse
   namespace: observabilidad
 spec:
-  type: ClusterIP
   selector:
     app: clickhouse
+  type: ClusterIP
   ports:
-  - port: 8123
-    targetPort: 8123
-    name: http
-  - port: 9000
-    targetPort: 9000
-    name: tcp
+    - name: http
+      port: 8123
+      targetPort: 8123
+    - name: tcp
+      port: 9000
+      targetPort: 9000

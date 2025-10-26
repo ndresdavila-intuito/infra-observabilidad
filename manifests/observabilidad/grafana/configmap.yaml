@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: observabilidad
+data:
+  grafana.ini: |
+    [security]
+    admin_user = admin
+    ; admin_password is taken from secret

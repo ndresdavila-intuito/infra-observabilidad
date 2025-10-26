@@ -1,49 +1,44 @@
-# tunnel-windows-auto.ps1
-# -----------------------
-# Script para abrir túneles SSH que sirven para navegador y CLI de ArgoCD
+# tunnel-windows.ps1
+# ------------------
+# Script para levantar port-forwards de ArgoCD, ClickHouse y VictoriaMetrics
+# desde Windows hacia la VM, en una sola ventana y con una sola contraseña.
 
-# IP pública de tu VM
 $VM_IP = "5.189.188.233"
-# Usuario SSH
 $VM_USER = "root"
 
 Write-Host "==============================="
-Write-Host " Iniciando túneles SSH hacia $VM_IP"
+Write-Host " Limpiando puertos antiguos en la VM"
 Write-Host "==============================="
 
-# Comando SSH con túneles:
-#  - 8080: ArgoCD UI y CLI
-#  - 8123: ClickHouse UI
-#  - 8428: VictoriaMetrics UI
-$sshCommand = "ssh -N -L 8080:localhost:443 -L 8123:localhost:8123 -L 8428:localhost:8428 $VM_USER@$VM_IP"
+# Puertos que queremos liberar
+$ports = @(8080, 8123, 8428)
+$killCommand = ($ports | ForEach-Object { "sudo fuser -k $_/tcp;" }) -join " "
+ssh $VM_USER@$VM_IP $killCommand
 
-Write-Host "Ejecutando túneles SSH..."
-Write-Host $sshCommand
+Start-Sleep -Seconds 2
 
-# Ejecuta SSH en segundo plano y mantiene la ventana abierta
-$sshProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", $sshCommand -PassThru
+Write-Host "==============================="
+Write-Host " Levantando túneles SSH para port-forward de Kubernetes"
+Write-Host "==============================="
 
-# Espera unos segundos para que se establezcan los túneles
+# Comando que ejecuta los port-forwards dentro de la VM
+$portForwardCmd = @"
+kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+kubectl port-forward svc/clickhouse -n observabilidad 8123:8123 &
+kubectl port-forward svc/victoria-metrics -n observabilidad 8428:8428 &
+wait
+"@
+
+# Abrimos un SSH interactivo que ejecuta los port-forwards
+# La opción -t permite pseudo-terminal para que se mantenga activo
+ssh -t $VM_USER@$VM_IP $portForwardCmd
+
+# Espera unos segundos para que los port-forwards se levanten
 Start-Sleep -Seconds 5
 
-Write-Host ""
 Write-Host "Abriendo navegadores..."
+Start-Process "https://localhost:8080/argo"      # ArgoCD
+Start-Process "http://localhost:8123/play"       # ClickHouse
+Start-Process "http://localhost:8428/vmui"       # VictoriaMetrics
 
-# URLs locales a través de los túneles
-$urls = @(
-    "http://localhost:8080",       # ArgoCD UI
-    "http://localhost:8123/play",  # ClickHouse UI
-    "http://localhost:8428/vmui"   # VictoriaMetrics UI
-)
-
-# Abrir cada URL en el navegador predeterminado
-foreach ($url in $urls) {
-    Start-Process $url
-}
-
-Write-Host ""
-Write-Host "Túneles activos."
-Write-Host "Puedes usar la CLI de ArgoCD desde Windows:"
-Write-Host "  argocd login localhost:8080 --insecure --username admin --password <tu-password>"
-Write-Host ""
-Write-Host "Cierra esta ventana para terminar los túneles SSH."
+Write-Host "Túneles activos. Presiona Ctrl+C o cierra la ventana para finalizar."

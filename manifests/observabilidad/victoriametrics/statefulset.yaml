@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: victoriametrics
+  namespace: observabilidad
+  labels:
+    app: victoriametrics
+spec:
+  serviceName: "victoriametrics"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victoriametrics
+  template:
+    metadata:
+      labels:
+        app: victoriametrics
+    spec:
+      containers:
+      - name: victoriametrics
+        image: victoriametrics/victoria-metrics-single:latest
+        imagePullPolicy: IfNotPresent
+        args:
+          - "-retentionPeriod=3"
+          - "-storageDataPath=/victoria-metrics-data"
+          - "-httpAuth.username=$(AUTH_USERNAME)"
+          - "-httpAuth.password=$(AUTH_PASSWORD)"
+        ports:
+        - containerPort: 8428
+          name: http
+        env:
+        - name: AUTH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: victoriametrics-auth
+              key: auth-username
+        - name: AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: victoriametrics-auth
+              key: auth-password
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+        volumeMounts:
+        - name: vm-storage
+          mountPath: /victoria-metrics-data
+  volumeClaimTemplates:
+  - metadata:
+      name: vm-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: gp3
