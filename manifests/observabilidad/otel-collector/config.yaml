@@ -11,7 +11,7 @@ data:
           grpc:
           http:
     exporters:
-      logging:
+      debug:
         loglevel: info
       zipkin:
         endpoint: "http://zipkin:9411/api/v2/spans"
@@ -19,4 +19,4 @@ data:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [logging, zipkin]
+          exporters: [debug, zipkin]
