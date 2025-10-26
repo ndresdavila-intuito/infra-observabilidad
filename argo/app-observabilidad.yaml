@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/ndresdavila-intuito/infra-observabilidad.git' # repo con todos los recursos
+    repoURL: 'https://github.com/ndresdavila-intuito/infra-observabilidad.git'
     targetRevision: HEAD
     path: manifests/observabilidad
   destination:
@@ -19,3 +19,14 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: victoriametrics
+      namespace: observabilidad
+      jsonPointers:
+        - /spec/persistentVolumeClaimRetentionPolicy
+        - /spec/podManagementPolicy
+        - /status
