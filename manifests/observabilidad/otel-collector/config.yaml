@@ -11,8 +11,7 @@ data:
           grpc:
           http:
     exporters:
-      debug:
-        loglevel: info
+      debug: {}
       zipkin:
         endpoint: "http://zipkin:9411/api/v2/spans"
     service:
