@@ -23,22 +23,11 @@ spec:
         args:
           - "-retentionPeriod=3"
           - "-storageDataPath=/victoria-metrics-data"
-          - "-httpAuth.username=$(AUTH_USERNAME)"
-          - "-httpAuth.password=$(AUTH_PASSWORD)"
+          - "-httpAuth.username=admin"
+          - "-httpAuth.password=campbar-por-password"
         ports:
         - containerPort: 8428
           name: http
-        env:
-        - name: AUTH_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: victoriametrics-auth
-              key: auth-username
-        - name: AUTH_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: victoriametrics-auth
-              key: auth-password
         resources:
           requests:
             cpu: "200m"
