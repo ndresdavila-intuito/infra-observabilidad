@@ -16,35 +16,41 @@ spec:
         app: clickhouse
     spec:
       containers:
-      - name: clickhouse
-        image: clickhouse/clickhouse-server:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 8123
-        - containerPort: 9000
-        env:
-        - name: CLICKHOUSE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: clickhouse-secret
-              key: password
-        volumeMounts:
-        - name: clickhouse-storage
-          mountPath: /var/lib/clickhouse
-        readinessProbe:
-          httpGet:
-            path: /ping
-            port: 8123
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        resources:
-          requests:
-            cpu: "250m"
-            memory: "512Mi"
-          limits:
-            cpu: "1000m"
-            memory: "2Gi"
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8123
+            - containerPort: 9000
+          env:
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
+          volumeMounts:
+            - name: clickhouse-storage
+              mountPath: /var/lib/clickhouse
+            - name: clickhouse-user-config
+              mountPath: /etc/clickhouse-server/users.d
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
       volumes:
-      - name: clickhouse-storage
-        persistentVolumeClaim:
-          claimName: clickhouse-pvc
+        - name: clickhouse-storage
+          persistentVolumeClaim:
+            claimName: clickhouse-pvc
+        - name: clickhouse-user-config
+          configMap:
+            name: clickhouse-user-config

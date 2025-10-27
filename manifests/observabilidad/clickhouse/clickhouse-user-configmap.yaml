@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clickhouse-user-config
+  namespace: observabilidad
+data:
+  default-password.xml: |
+    <yandex>
+      <users>
+        <default>
+          <password>cambiar-por-tu-password-seguro</password>
+          <profile>default</profile>
+          <quota>default</quota>
+        </default>
+      </users>
+    </yandex>
