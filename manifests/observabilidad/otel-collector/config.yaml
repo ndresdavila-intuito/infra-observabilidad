@@ -25,11 +25,7 @@ data:
         tls:
           insecure: true
         headers:
-          Authorization:
-            valueFrom:
-              secretKeyRef:
-                name: victoriametrics-auth-basic
-                key: auth-basic
+          Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
       clickhouse:
         endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
 
