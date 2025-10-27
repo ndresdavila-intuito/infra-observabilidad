@@ -20,8 +20,8 @@ data:
       zipkin:
         endpoint: "http://zipkin:9411/api/v2/spans"
 
-      # Metrics → VictoriaMetrics
-      victoriametrics:
+      # Metrics → VictoriaMetrics usando Prometheus remote write
+      prometheusremotewrite/victoriametrics:
         endpoint: "http://victoriametrics:8428/api/v1/write"
         headers:
           Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
@@ -38,7 +38,7 @@ data:
 
         metrics:
           receivers: [otlp]
-          exporters: [victoriametrics, debug]
+          exporters: [prometheusremotewrite/victoriametrics, debug]
 
         logs:
           receivers: [otlp]
