@@ -23,9 +23,8 @@ data:
         tls:
           insecure: true
       clickhouse:
-        endpoint: "tcp://clickhouse:9000"
-        username: "default"
-        password: "${CLICKHOUSE_PASSWORD}"
+        endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
+
 
     service:
       pipelines:
