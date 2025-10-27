@@ -31,9 +31,9 @@ spec:
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
-            - name: clickhouse-config
-              mountPath: /etc/clickhouse-server/config.d/listen.xml
-              subPath: listen.xml
+            - name: clickhouse-init
+              mountPath: /docker-entrypoint-initdb.d/init-db.sql
+              subPath: init-db.sql
           startupProbe:
             httpGet:
               path: /ping
@@ -69,3 +69,6 @@ spec:
         - name: clickhouse-storage
           persistentVolumeClaim:
             claimName: clickhouse-pvc
+        - name: clickhouse-init
+          configMap:
+            name: clickhouse-init
