@@ -1,44 +1,44 @@
-# tunnel-windows.ps1
-# ------------------
-# Script para levantar port-forwards de ArgoCD, ClickHouse y VictoriaMetrics
-# desde Windows hacia la VM, en una sola ventana y con una sola contraseña.
+# ==========================================
+# Túneles SSH únicos para todas las herramientas
+# ==========================================
 
 $VM_IP = "5.189.188.233"
 $VM_USER = "root"
 
-Write-Host "==============================="
-Write-Host " Limpiando puertos antiguos en la VM"
-Write-Host "==============================="
+Write-Host "==================================="
+Write-Host "Creando un solo túnel SSH con todos los port-forwards..."
+Write-Host "Mantén esta ventana abierta para usar los servicios."
+Write-Host "Se te pedirá la contraseña solo una vez."
+Write-Host "Presiona Ctrl+C para cerrar todo."
+Write-Host "==================================="
 
-# Puertos que queremos liberar
-$ports = @(8080, 8123, 8428)
-$killCommand = ($ports | ForEach-Object { "sudo fuser -k $_/tcp;" }) -join " "
-ssh $VM_USER@$VM_IP $killCommand
+# Forwarding: local:remote
+$forwards = @(
+    "8080:localhost:80",    # ArgoCD
+    "3000:localhost:3000",  # Grafana
+    "8428:localhost:8428",  # VictoriaMetrics
+    "8123:localhost:8123",  # ClickHouse HTTP
+    "9000:localhost:9000",  # ClickHouse TCP
+    "9411:localhost:9411"   # Zipkin
+)
 
-Start-Sleep -Seconds 2
+# Convertir array a string para pasar a ssh
+$forwardArgs = $forwards | ForEach-Object { "-L $_" } | Out-String
+$forwardArgs = $forwardArgs -replace "`r`n", " "
 
-Write-Host "==============================="
-Write-Host " Levantando túneles SSH para port-forward de Kubernetes"
-Write-Host "==============================="
+# Lanzar ssh en modo no interactivo para mantener túneles
+Start-Process "ssh" -ArgumentList "$forwardArgs $VM_USER@$VM_IP -N" -NoNewWindow
 
-# Comando que ejecuta los port-forwards dentro de la VM
-$portForwardCmd = @"
-kubectl port-forward svc/argocd-server -n argocd 8080:443 &
-kubectl port-forward svc/clickhouse -n observabilidad 8123:8123 &
-kubectl port-forward svc/victoria-metrics -n observabilidad 8428:8428 &
-wait
-"@
+# Esperar un par de segundos a que se levanten los túneles
+Start-Sleep -Seconds 3
 
-# Abrimos un SSH interactivo que ejecuta los port-forwards
-# La opción -t permite pseudo-terminal para que se mantenga activo
-ssh -t $VM_USER@$VM_IP $portForwardCmd
-
-# Espera unos segundos para que los port-forwards se levanten
-Start-Sleep -Seconds 5
-
+# Abrir navegadores para las UIs HTTP
 Write-Host "Abriendo navegadores..."
-Start-Process "https://localhost:8080/argo"      # ArgoCD
-Start-Process "http://localhost:8123/play"       # ClickHouse
-Start-Process "http://localhost:8428/vmui"       # VictoriaMetrics
+Start-Process "http://localhost:8080"    # ArgoCD
+Start-Process "http://localhost:3000"    # Grafana
+Start-Process "http://localhost:8428"    # VictoriaMetrics
+Start-Process "http://localhost:8123"    # ClickHouse HTTP
+Start-Process "http://localhost:9411"    # Zipkin
 
-Write-Host "Túneles activos. Presiona Ctrl+C o cierra la ventana para finalizar."
+Write-Host "`nTúneles activos. Mantén esta ventana abierta."
+Write-Host "Presiona Ctrl+C para cerrar todos los túneles."
