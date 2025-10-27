@@ -28,12 +28,8 @@ data:
 
       # Logs → ClickHouse
       clickhouse:
-        endpoint: "http://clickhouse:8123"
-        database: "observabilidad"
-        table: "otel_logs"
-        username: "default"
-        password: "cambiar-por-tu-password-seguro"
-        
+        endpoint: "tcp://default:@clickhouse:9000/observabilidad"
+
     service:
       pipelines:
         traces:
