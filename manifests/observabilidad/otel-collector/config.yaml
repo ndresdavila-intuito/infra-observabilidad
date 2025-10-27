@@ -9,7 +9,7 @@ data:
       otlp:
         protocols:
           grpc:
-          http
+          http:
 
     exporters:
       debug: {}
