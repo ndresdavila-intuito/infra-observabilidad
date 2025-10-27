@@ -15,27 +15,6 @@ spec:
       labels:
         app: clickhouse
     spec:
-      initContainers:
-        - name: copy-users
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              # Reemplaza ${CLICKHOUSE_PASSWORD} por el secreto real
-              sed "s|\${CLICKHOUSE_PASSWORD}|$CLICKHOUSE_PASSWORD|g" /config/default-user.xml > /users/default-user.xml
-          env:
-            - name: CLICKHOUSE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: clickhouse-secret
-                  key: password
-          volumeMounts:
-            - name: user-config
-              mountPath: /config
-            - name: clickhouse-users
-              mountPath: /users
-
       containers:
         - name: clickhouse
           image: clickhouse/clickhouse-server:latest
@@ -49,20 +28,15 @@ spec:
                 secretKeyRef:
                   name: clickhouse-secret
                   key: password
-
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
-            - name: clickhouse-users
-              mountPath: /etc/clickhouse-server/users.d
-
           readinessProbe:
             httpGet:
               path: /ping
               port: 8123
             initialDelaySeconds: 10
             periodSeconds: 10
-
           resources:
             requests:
               cpu: "250m"
@@ -70,13 +44,7 @@ spec:
             limits:
               cpu: "1000m"
               memory: "2Gi"
-
       volumes:
         - name: clickhouse-storage
           persistentVolumeClaim:
             claimName: clickhouse-pvc
-        - name: user-config
-          configMap:
-            name: clickhouse-user-config
-        - name: clickhouse-users
-          emptyDir: {}
