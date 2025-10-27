@@ -15,6 +15,16 @@ spec:
       labels:
         app: clickhouse
     spec:
+      initContainers:
+        - name: copy-users
+          image: busybox
+          command: ["sh", "-c", "cp /config/* /users/"]
+          volumeMounts:
+            - name: user-config
+              mountPath: /config
+            - name: clickhouse-users
+              mountPath: /users
+
       containers:
         - name: clickhouse
           image: clickhouse/clickhouse-server:latest
@@ -32,7 +42,7 @@ spec:
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
-            - name: user-config
+            - name: clickhouse-users
               mountPath: /etc/clickhouse-server/users.d
 
           readinessProbe:
@@ -57,3 +67,5 @@ spec:
         - name: user-config
           configMap:
             name: clickhouse-user-config
+        - name: clickhouse-users
+          emptyDir: {}
