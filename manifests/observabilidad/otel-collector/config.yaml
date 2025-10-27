@@ -28,12 +28,14 @@ data:
           Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
       clickhouse:
         endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
+        database: "observabilidad"
+        table: "logs_app"
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [zipkin, clickhouse, debug]
+          exporters: [zipkin, debug]
         metrics:
           receivers: [otlp]
           exporters: [otlphttp/victoriametrics, debug]
