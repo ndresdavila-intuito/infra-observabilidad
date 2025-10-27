@@ -24,9 +24,14 @@ data:
         logs_endpoint: "http://victoriametrics:9428/insert/opentelemetry/v1/logs"
         tls:
           insecure: true
+        headers:
+          Authorization:
+            valueFrom:
+              secretKeyRef:
+                name: victoriametrics-auth
+                key: auth-basic
       clickhouse:
         endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
-
 
     service:
       pipelines:
