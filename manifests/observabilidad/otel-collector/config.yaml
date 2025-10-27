@@ -28,6 +28,16 @@ data:
           Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
       clickhouse:
         endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
+        database: "observabilidad"
+        table: "logs_app"
+        attributes:
+          timestamp: "@timestamp"
+          level: "log.severity"
+          service: "service.name"
+          message: "log.message"
+          host: "host.name"
+          environment: "deployment.environment"
+          metadata: "attributes" # Todo lo demás en un JSON
 
     service:
       pipelines:
