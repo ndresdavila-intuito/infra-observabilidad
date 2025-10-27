@@ -28,18 +28,20 @@ spec:
                 secretKeyRef:
                   name: clickhouse-secret
                   key: password
+
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
             - name: user-config
-              mountPath: /etc/clickhouse-server/users.d/default-user.xml
-              subPath: default-user.xml
+              mountPath: /etc/clickhouse-server/users.d
+
           readinessProbe:
             httpGet:
               path: /ping
               port: 8123
             initialDelaySeconds: 10
             periodSeconds: 10
+
           resources:
             requests:
               cpu: "250m"
@@ -47,6 +49,7 @@ spec:
             limits:
               cpu: "1000m"
               memory: "2Gi"
+
       volumes:
         - name: clickhouse-storage
           persistentVolumeClaim:
