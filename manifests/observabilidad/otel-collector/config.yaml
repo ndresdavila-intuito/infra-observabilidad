@@ -26,8 +26,8 @@ data:
           insecure: true
         headers:
           Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
-        clickhouse:
-          endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
+      clickhouse:
+        endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
 
     service:
       pipelines:
