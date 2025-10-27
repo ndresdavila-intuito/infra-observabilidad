@@ -28,7 +28,7 @@ data:
 
       # Logs → ClickHouse
       clickhouse:
-        endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
+        endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000/observabilidad?table=logs"
 
     service:
       pipelines:
