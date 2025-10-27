@@ -35,6 +35,7 @@ spec:
             httpGet:
               path: /ping
               port: 8123
+              host: clickhouse
             initialDelaySeconds: 10
             periodSeconds: 10
           resources:
