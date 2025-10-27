@@ -31,12 +31,33 @@ spec:
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
+            - name: clickhouse-config
+              mountPath: /etc/clickhouse-server/config.d/listen.xml
+              subPath: listen.xml
+          startupProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
           readinessProbe:
             httpGet:
               path: /ping
               port: 8123
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 3
           resources:
             requests:
               cpu: "250m"
