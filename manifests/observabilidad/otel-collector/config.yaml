@@ -8,26 +8,15 @@ data:
     receivers:
       otlp:
         protocols:
-          grpc: {}
-          http: {}
-
+          grpc:
+          http:
     exporters:
-      debug: {}
+      debug:
+        loglevel: info
       zipkin:
         endpoint: "http://zipkin:9411/api/v2/spans"
-      victoriametrics:
-        endpoint: "http://victoriametrics:8428/api/v1/import"
-      clickhouse:
-        endpoint: "tcp://clickhouse:9000"
-
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [zipkin, clickhouse, debug]
-        metrics:
-          receivers: [otlp]
-          exporters: [victoriametrics, debug]
-        logs:
-          receivers: [otlp]
-          exporters: [clickhouse, debug]
+          exporters: [debug, zipkin]
