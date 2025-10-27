@@ -15,8 +15,13 @@ data:
       debug: {}
       zipkin:
         endpoint: "http://zipkin:9411/api/v2/spans"
-      victoriametrics:
-        endpoint: "http://victoriametrics:8428/api/v1/import"
+      otlphttp/victoriametrics:
+        compression: gzip
+        encoding: proto
+        metrics_endpoint: "http://victoriametrics:8428/opentelemetry/v1/metrics"
+        logs_endpoint: "http://victoriametrics:9428/insert/opentelemetry/v1/logs"
+        tls:
+          insecure: true
       clickhouse:
         endpoint: "tcp://clickhouse:9000"
 
@@ -27,7 +32,7 @@ data:
           exporters: [zipkin, clickhouse, debug]
         metrics:
           receivers: [otlp]
-          exporters: [victoriametrics, debug]
+          exporters: [otlphttp/victoriametrics, debug]
         logs:
           receivers: [otlp]
-          exporters: [clickhouse, debug]
+          exporters: [clickhouse, otlphttp/victoriametrics, debug]
