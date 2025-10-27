@@ -28,7 +28,7 @@ data:
           Authorization:
             valueFrom:
               secretKeyRef:
-                name: victoriametrics-auth
+                name: victoriametrics-auth-basic
                 key: auth-basic
       clickhouse:
         endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000"
