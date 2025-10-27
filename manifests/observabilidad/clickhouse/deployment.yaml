@@ -18,7 +18,18 @@ spec:
       initContainers:
         - name: copy-users
           image: busybox
-          command: ["sh", "-c", "cp /config/* /users/"]
+          command:
+            - sh
+            - -c
+            - |
+              # Reemplaza ${CLICKHOUSE_PASSWORD} por el secreto real
+              sed "s|\${CLICKHOUSE_PASSWORD}|$CLICKHOUSE_PASSWORD|g" /config/default-user.xml > /users/default-user.xml
+          env:
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
           volumeMounts:
             - name: user-config
               mountPath: /config
