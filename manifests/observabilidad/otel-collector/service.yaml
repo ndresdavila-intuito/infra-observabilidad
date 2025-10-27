@@ -6,11 +6,13 @@ metadata:
 spec:
   selector:
     app: otel-collector
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: otlp-grpc
       port: 4317
       targetPort: 4317
+      nodePort: 31317
     - name: otlp-http
       port: 55681
       targetPort: 55681
+      nodePort: 31318
