@@ -31,6 +31,9 @@ spec:
           volumeMounts:
             - name: clickhouse-storage
               mountPath: /var/lib/clickhouse
+            - name: user-config
+              mountPath: /etc/clickhouse-server/users.d/default-user.xml
+              subPath: default-user.xml
           readinessProbe:
             httpGet:
               path: /ping
@@ -48,3 +51,6 @@ spec:
         - name: clickhouse-storage
           persistentVolumeClaim:
             claimName: clickhouse-pvc
+        - name: user-config
+          configMap:
+            name: clickhouse-user-config
