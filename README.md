@@ -4,8 +4,6 @@ Este manual explica cómo desplegar los servicios de observabilidad —VictoriaM
 
 ---
 
-## 0. Scripts de Utilidad
-
 ### Ver estado general de Kubernetes y ArgoCD
 
 ```bash
