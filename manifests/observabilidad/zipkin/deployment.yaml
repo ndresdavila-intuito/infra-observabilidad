@@ -16,14 +16,24 @@ spec:
         app: zipkin
     spec:
       containers:
-      - name: zipkin
-        image: openzipkin/zipkin:2.23.2
-        ports:
-        - containerPort: 9411
-        resources:
-          requests:
-            cpu: "50m"
-            memory: "128Mi"
-          limits:
-            cpu: "200m"
-            memory: "512Mi"
+        - name: zipkin
+          image: openzipkin/zipkin:2.23.2
+          ports:
+            - containerPort: 9411
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          env:
+            - name: STORAGE_TYPE
+              value: "file"
+          volumeMounts:
+            - name: zipkin-storage
+              mountPath: /zipkin
+      volumes:
+        - name: zipkin-storage
+          persistentVolumeClaim:
+            claimName: zipkin-pvc
