@@ -27,6 +27,11 @@ spec:
                 secretKeyRef:
                   name: clickhouse-secret
                   key: password
+            - name: OTEL_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: otel-token
+                  key: token
           volumeMounts:
             - name: config
               mountPath: /conf
