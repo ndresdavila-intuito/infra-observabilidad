@@ -16,32 +16,32 @@ spec:
         app: otel-collector
     spec:
       containers:
-      - name: otel-collector
-        image: otel/opentelemetry-collector-contrib:0.138.0
-        command:
-          - "/otelcol-contrib"
-          - "--config=/conf/otel-collector-config.yaml"
-        env:
-          - name: CLICKHOUSE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: clickhouse-secret
-                key: password
-        volumeMounts:
-          - name: config
-            mountPath: /conf
-        ports:
-          - containerPort: 4317
-            name: otlp-grpc
-          - containerPort: 55681
-            name: otlp-http
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
+        - name: otel-collector
+          image: otel/opentelemetry-collector-contrib:0.138.0
+          command:
+            - "/otelcol-contrib"
+            - "--config=/conf/otel-collector-config.yaml"
+          env:
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
+          volumeMounts:
+            - name: config
+              mountPath: /conf
+          ports:
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 55681
+              name: otlp-http
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
       volumes:
         - name: config
           configMap:
