@@ -1,49 +1,52 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: victoriametrics
-  namespace: observabilidad
+  annotations:
+    argocd.argoproj.io/tracking-id: observabilidad:apps/StatefulSet:observabilidad/victoriametrics
   labels:
     app: victoriametrics
+  name: victoriametrics
+  namespace: observabilidad
 spec:
-  serviceName: "victoriametrics"
   replicas: 1
   selector:
     matchLabels:
       app: victoriametrics
+  serviceName: victoriametrics
   template:
     metadata:
       labels:
         app: victoriametrics
     spec:
       containers:
-      - name: victoriametrics
-        image: victoriametrics/victoria-metrics:latest
-        imagePullPolicy: IfNotPresent
-        args:
-          - "-retentionPeriod=3"
-          - "-storageDataPath=/victoria-metrics-data"
-          - "-httpAuth.username=admin"
-          - "-httpAuth.password=campbar-por-password"
-        ports:
-        - containerPort: 8428
-          name: http
+        - args:
+            - "-retentionPeriod=3"
+            - "-storageDataPath=/victoria-metrics-data"
+            - "-httpAuth.username=admin"
+            - "-httpAuth.password=campbar-por-password"
+          image: victoriametrics/victoria-metrics:latest
+          imagePullPolicy: IfNotPresent
+          name: victoriametrics
+          ports:
+            - containerPort: 8428
+              name: http
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /victoria-metrics-data
+              name: vm-storage
+  volumeClaimTemplates:
+    - metadata:
+        name: vm-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
         resources:
           requests:
-            cpu: "200m"
-            memory: "256Mi"
-          limits:
-            cpu: "1000m"
-            memory: "2Gi"
-        volumeMounts:
-        - name: vm-storage
-          mountPath: /victoria-metrics-data
-  volumeClaimTemplates:
-  - metadata:
-      name: vm-storage
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 10Gi
-      storageClassName: local-path
+            storage: 10Gi
+        storageClassName: local-path
