@@ -13,6 +13,11 @@ data:
           http:
             endpoint: "0.0.0.0:55681"
 
+    processors:
+      batch:
+        timeout: 5s
+        send_batch_size: 5000
+
     exporters:
       debug: {}
 
@@ -26,20 +31,37 @@ data:
         headers:
           Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
 
-      # Traces y Logs → ClickHouse
+      # Traces y Logs → ClickHouse persistente
       clickhouse:
-        endpoint: "tcp://default:${CLICKHOUSE_PASSWORD}@clickhouse:9000/observabilidad"
+        endpoint: "tcp://clickhouse:9000/observabilidad"
+        username: "default"
+        password: "${CLICKHOUSE_PASSWORD}"
+        database: "default"
+        logs_table_name: "otel_logs"
+        traces_table_name: "otel_traces"
+        create_schema: true
+        timeout: 5s
+        sending_queue:
+          queue_size: 1000
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s
+          max_interval: 30s
+          max_elapsed_time: 300s
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [zipkin, clickhouse, debug]
+          processors: [batch]
+          exporters: [clickhouse, zipkin, debug]
 
         metrics:
           receivers: [otlp]
+          processors: [batch]
           exporters: [prometheusremotewrite/victoriametrics, debug]
 
         logs:
           receivers: [otlp]
+          processors: [batch]
           exporters: [clickhouse, debug]
