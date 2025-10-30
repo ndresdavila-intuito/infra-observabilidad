@@ -23,7 +23,7 @@ spec:
             - "-retentionPeriod=3"
             - "-storageDataPath=/victoria-metrics-data"
             - "-httpAuth.username=admin"
-            - "-httpAuth.password=campbar-por-password"
+            - "-httpAuth.password=58Uyf28hZ"
           image: victoriametrics/victoria-metrics:latest
           imagePullPolicy: IfNotPresent
           name: victoriametrics

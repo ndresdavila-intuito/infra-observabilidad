@@ -25,7 +25,7 @@ data:
       prometheusremotewrite/victoriametrics:
         endpoint: "http://victoriametrics:8428/api/v1/write"
         headers:
-          Authorization: "Basic YWRtaW46Y2FtcGJhci1wb3ItcGFzc3dvcmQ="
+          Authorization: "Basic YWRtaW46NThVeWYyOGha"
       clickhouse:
         endpoint: "tcp://clickhouse:9000?dial_timeout=10s&compress=lz4&async_insert=1"
         database: "default"
